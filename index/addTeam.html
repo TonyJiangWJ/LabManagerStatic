@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加项目组</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <table class="table-responsive">
+        <thead>
+        <tr>
+            <th>项目组信息</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>组名：</td>
+            <td><input type="text" value="" id="teamName"></td>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <button class="btn-default" onclick="addInfo()">保存信息</button>
+                    <button class="btn-primary" onclick="history.back()">返回</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="col-md-4"></div>
+</body>
+<script type="text/javascript">
+    function addInfo() {
+        if (getCookie("loginType") === "teacher") {
+            var teacherId = getCookie("userCode");
+            var teamName = $('#teamName').val();
+            $.ajax({
+                url: "http://localhost:1011/labcode/put/team/info",
+                data: {
+                    "teacherId": teacherId,
+                    "teamName": teamName
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        alert("保存成功");
+                    } else {
+                        alert("保存失败" + JSON.stringify(resp));
+                    }
+                }
+            })
+        }
+
+    }
+</script>
+</html>

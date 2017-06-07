@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>教师管理页面</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div>
+            <a href="teacherInfo.html">查看我的信息</a><br/>
+            <a href="ProjectManage.html">管理项目组</a>
+        </div>
+        <div>
+            <input type="text" id="userName">
+            <button class="btn-success" onclick="searchUser()">查找学生信息</button>
+        </div>
+        <button class="btn-primary" onclick="history.back()">返回</button>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+</body>
+<script type="text/javascript">
+    function searchUser() {
+        var userName = $('#userName').val();
+        if (userName !== '') {
+            $.ajax({
+                url: "http://localhost:1011/labcode/list/student",
+                data: {
+                    "studentName": userName
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        goToStudentListView(resp.studentInfos);
+                    } else {
+                        alert("不存在学生信息");
+                    }
+                }
+            })
+        }
+    }
+</script>
+</html>

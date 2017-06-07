@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>教师信息</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <table class="table-responsive">
+            <thead>
+            <tr>
+                <th>教师信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>姓名：</td>
+                <td><input readonly type="text" value="" id="teacherName"></td>
+            </tr>
+            <tr>
+                <td>教师号：</td>
+                <td><input readonly type="text" value="" id="teacherNo"></td>
+            </tr>
+            <tr>
+                <td>性别：</td>
+                <td><input readonly type="text" value="" id="gender"></td>
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <button class="btn-default" onclick="modifyInfo()">修改信息</button>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <button id="teacherLogout" class="btn-danger" style="display:none;" onclick="logout()">退出登陆
+                        </button>
+                        <button id="teacherBack" class="btn-warning" style="display:none" onclick="back()">返回</button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="col-md-4"></div>
+</div>
+</body>
+<script type="text/javascript">
+
+    function modifyInfo() {
+        if (getCookie("loginType") === 'teacher') {
+            var gender = $('#gender').val();
+            var teacherName = $('#teacherName').val();
+            var teacherNo = $('#teacherNo').val();
+            $.ajax({
+                url: "http://localhost:1011/labcode/update/teacher/info",
+                data: {
+                    "teacherId": getCookie("userCode"),
+                    "type": "teacher",
+                    "teacherNo": teacherNo,
+                    "teacherName":teacherName,
+                    "gender":gender
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        alert("修改成功");
+                        window.location.reload();
+                    } else {
+                        alert("修改失败");
+                    }
+                }
+            })
+        }
+    }
+
+    function logout() {
+        clearCookie();
+        window.location.href="index.html";
+    }
+
+    function back() {
+        window.history.back();
+    }
+    $(function () {
+        if (getCookie("userCode") === undefined || getCookie("userCode") === '') {
+            alert("请登陆");
+        } else if (getCookie("loginType") === 'student') {
+            window.location.href="index.html";
+        } else if (getCookie("loginType") === 'teacher') {
+            $('#teacherBack').css({"display": "block"});
+            $.ajax({
+                url: "http://localhost:1011/labcode/teacher/info/get",
+                data: {
+                    "teacherId": getCookie("userCode")
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        $('#teacherName').val(resp.teacherName).removeAttr("readonly");
+                        $('#teacherNo').val(resp.teacherNo).removeAttr("readonly");
+                        $('#gender').val(resp.gender).removeAttr("readonly");
+                    }
+                }
+            })
+        }
+
+    })
+
+</script>
+</html>

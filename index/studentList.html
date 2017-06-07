@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息列表</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <table>
+        <thead>
+        <tr>
+            <th>学生列表</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="studentList">
+
+        </tbody>
+
+    </table>
+    <button class="btn-primary" onclick="history.back()">返回</button>
+
+</div>
+<div class="col-md-4"></div>
+</body>
+<script type="text/javascript">
+    $(function () {
+        var $studentList = $('#studentList');
+        var studentListObj = JSON.parse(localStorage.getItem("studentList"));
+        var html = '';
+        for (var i = 0; i < studentListObj.length; i++) {
+            html += '<tr>'
+                + '<td>' + studentListObj[i].studentName
+                + '</td>'
+                + '<td>' + '<a href="#">查看详情</a> '
+                + '<input type="hidden" value="' + studentListObj[i].studentId + '">'
+                + '</td>'
+                + '</tr>';
+        }
+        $studentList.html(html);
+        $studentList.undelegate();
+        $studentList.delegate('a', 'click', function (event) {
+            var studentId = $(this).next('input').val();
+            goTOStudentInfoView(studentId);
+        })
+    })
+</script>
+</html>

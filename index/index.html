@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+</head>
+<body>
+<div class="container">
+
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="padding: 20px;">
+        <span>用户名：</span>
+        <input class="input-group" id="userName" placeholder="用户名" type="text">
+        <span>密码：</span>
+        <input class="input-group" id="password" placeholder="密码" type="password">
+        <div>
+            <select id="loginType">
+                <option value="student">学生</option>
+                <option value="teacher">教师</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">登陆</button>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+</body>
+<script type="text/javascript">
+    function doLogin() {
+        var userName = $('#userName').val();
+        var password = $('#password').val();
+        var loginType = $('#loginType').val();
+        $.ajax({
+            url: "http://localhost:1011/labcode/user/login",
+            data: {
+                "userName": userName,
+                "password": password,
+                "loginType": loginType
+            },
+            success: function (resp) {
+                console.log(JSON.stringify(resp));
+                if (resp.code === '0001') {
+                    setCookie("userCode", resp.userId, 10);
+                    setCookie("loginType", resp.userType, 10);
+                    console.log(getCookie("userCode"));
+                    console.log(getCookie("loginType"));
+                    if(loginType==='student'){
+                        window.location.href="studentInfo.html";
+                    }else{
+                        window.location.href="teacherManageIndex.html";
+                    }
+                } else {
+                    alert("登陆失败");
+                }
+            }
+        })
+    }
+</script>
+</html>

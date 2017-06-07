@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目组管理</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <div>
+        <button class="btn-warning" onclick="addTeam()">添加项目组</button>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>项目组名</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="teamList">
+
+        </tbody>
+    </table>
+    <button class="btn-primary" onclick="history.back()">返回</button>
+</div>
+<div class="col-md-4"></div>
+</body>
+<script type="text/javascript">
+
+    function addTeam() {
+        window.location.href = "addTeam.html";
+    }
+    $(function () {
+        $.ajax({
+            url: "http://localhost:1011/labcode/teacher/info/get",
+            data: {
+                "teacherId": getCookie("userCode")
+            },
+            success: function (resp) {
+                if (resp.code === '0001') {
+                    var teamList = resp.teamInfoList;
+                    if (teamList.length > 0) {
+                        var $teamList = $('#teamList');
+                        $teamList.html("");
+                        var html = "";
+                        for (var i = 0; i < teamList.length; i++) {
+                            html += '<tr>'
+                                + '<td>' + teamList[i].teamName
+                                + '</td>'
+                                + '<td>' + '<a href="javascript:void(0);">查看详情</a>'
+                                + '<input type="hidden" value="' + teamList[i].teamId + '">'
+                                + '</td>'
+                                + '<td>' + '<a href="javascript:void(0);">添加学生信息</a>'
+                                + '<input type="hidden" value="' + teamList[i].teamId + '">'
+                                + '</td>'
+                                + '</tr>';
+                        }
+                        $teamList.append(html);
+                        $teamList.undelegate();
+                        $teamList.delegate('td:nth-child(2) > a', "click", function (event) {
+                            console.log(this);
+                            var teamId = $(this).next("input").val();
+                            console.log(teamId);
+                            $.ajax({
+                                url: "http://localhost:1011/labcode/list/student",
+                                data: {
+                                    "teamId": teamId
+                                },
+                                success: function (resp) {
+                                    if (resp.code === '0001') {
+                                        goToStudentListView(resp.studentInfos);
+                                    } else {
+                                        alert("不存在学生信息");
+                                    }
+                                }
+                            })
+                        });
+                        $teamList.delegate('td:nth-child(3) > a', "click", function (event) {
+                            var teamId = $(this).next("input").val();
+                            localStorage.setItem("teamId", teamId);
+                            window.location.href = "addStudent.html";
+                        })
+                    }
+                }
+            }
+
+        })
+    })
+</script>
+</html>

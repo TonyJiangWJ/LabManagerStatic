@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <table class="table-responsive">
+            <thead>
+            <tr>
+                <th>学生信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>姓名：</td>
+                <td><input readonly type="text" value="" id="studentName"></td>
+            </tr>
+            <tr>
+                <td>学号：</td>
+                <td><input readonly type="text" value="" id="studentNo"></td>
+            </tr>
+            <tr>
+                <td>性别：</td>
+                <td><input readonly type="text" value="" id="gender"></td>
+            </tr>
+            <tr>
+                <td>邮箱：</td>
+                <td><input readonly type="text" value="" id="email"></td>
+            </tr>
+            <tr>
+                <td>所在项目组：</td>
+                <td><span id="teamName"></span></td>
+                <input type="hidden" value="" id="teamId">
+            </tr>
+            <tr>
+                <td>
+                    <div>
+                        <button class="btn-default" onclick="modifyInfo()">修改信息</button>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <button id="studentLogout" class="btn-danger" style="display:none;" onclick="logout()">退出登陆
+                        </button>
+                        <button id="teacherBack" class="btn-warning" style="display:none" onclick="back()">返回</button>
+                        <button id="delete" class="btn-danger" style="display:none" onclick="deleteStudent()">删除学生信息
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+    </div>
+    <div class="col-md-4"></div>
+</div>
+</body>
+<script type="text/javascript">
+
+    function modifyInfo() {
+        if (getCookie("loginType") === 'student') {
+            var email = $('#email').val();
+            $.ajax({
+                url: "http://localhost:1011/labcode//update/student/info",
+                data: {
+                    "studentId": getCookie("userCode"),
+                    "type": "student",
+                    "email": email
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        alert("修改成功");
+                        window.location.reload();
+                    } else {
+                        alert("修改失败");
+                    }
+                }
+            })
+        } else if (getCookie("loginType") === 'teacher') {
+            var email = $('#email').val();
+            var studentName = $('#studentName').val();
+            var studentNo = $('#studentNo').val();
+            var gender = $('#gender').val();
+
+            $.ajax({
+                url: "http://localhost:1011/labcode//update/student/info",
+                data: {
+                    "studentId": localStorage.getItem("studentId"),
+                    "type": "teacher",
+                    "email": email,
+                    "studentName": studentName,
+                    "studentNo": studentNo,
+                    "gender": gender
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        alert("修改成功");
+                        window.location.reload();
+                    } else {
+                        alert("修改失败");
+                    }
+                }
+            })
+        }
+    }
+
+    function logout() {
+        clearCookie();
+        window.location.href = "index.html";
+    }
+
+    function back() {
+        window.history.back();
+    }
+
+    function deleteStudent() {
+        var studentId = localStorage.getItem("studentId");
+        if (confirm("确定删除吗")) {
+            $.ajax({
+                url: "http://localhost:1011/labcode/delete/student/info",
+                data: {
+                    "teamId": $('#teamId').val(),
+                    "studentId": studentId,
+                    "type": "deleteStudent"
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        alert("删除成功");
+                        $.ajax({
+                            url: "http://localhost:1011/labcode/list/student",
+                            data: {
+                                "teamId": localStorage.getItem("teamId"),
+                                "studentName": localStorage.getItem("studentName")
+                            },
+                            success: function (resp) {
+                                window.location.href = "ProjectManage.html";
+                            }
+                        })
+                    } else {
+                        alert("删除失败");
+                    }
+                }
+            })
+        }
+    }
+
+    $(function () {
+        if (getCookie("userCode") === undefined || getCookie("userCode") === '') {
+            alert("请登陆");
+        } else if (getCookie("loginType") === 'student') {
+            $('#studentLogout').css({"display": "block"});
+            $.ajax({
+                url: "http://localhost:1011/labcode/student/info/get",
+                data: {
+                    "studentId": getCookie("userCode")
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        $('#studentName').val(resp.studentName);
+                        $('#studentNo').val(resp.studentNo);
+                        $('#gender').val(resp.gender);
+                        $('#email').val(resp.email).removeAttr("readonly");
+
+                        var teamList = resp.teamInfo;
+                        if (teamList.length > 0) {
+                            $('#teamName').text(teamList[0].teamName);
+                            $('#teamId').val(teamList[0].teamId);
+                        }
+                    }
+                }
+            })
+        } else if (getCookie("loginType") === 'teacher') {
+            $('#teacherBack').css({"display": "block"});
+            $('#delete').css({"display": "block"});
+            $.ajax({
+                url: "http://localhost:1011/labcode/student/info/get",
+                data: {
+                    "studentId": localStorage.getItem("studentId")
+                },
+                success: function (resp) {
+                    if (resp.code === '0001') {
+                        $('#studentName').val(resp.studentName).removeAttr("readonly");
+                        $('#studentNo').val(resp.studentNo).removeAttr("readonly");
+                        $('#gender').val(resp.gender).removeAttr("readonly");
+                        $('#email').val(resp.email).removeAttr("readonly");
+                        var teamList = resp.teamInfo;
+                        if (teamList.length > 0) {
+                            $('#teamName').text(teamList[0].teamName);
+                            $('#teamId').val(teamList[0].teamId);
+                        }
+                    }
+                }
+            })
+        }
+
+    })
+
+</script>
+</html>

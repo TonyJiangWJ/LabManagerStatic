@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加学生信息</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript" src="../js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.js"></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style type="text/css">
+        td {
+            padding: 10px 10px 10px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+    <table class="table-responsive">
+        <thead>
+        <tr>
+            <th>学生信息</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>姓名：</td>
+            <td><input type="text" value="" id="studentName"></td>
+        </tr>
+        <tr>
+            <td>学号：</td>
+            <td><input type="text" value="" id="studentNo"></td>
+        </tr>
+        <tr>
+            <td>性别：</td>
+            <td><input type="text" value="" id="gender"></td>
+        </tr>
+        <tr>
+            <td>邮箱：</td>
+            <td><input type="text" value="" id="email"></td>
+        </tr>
+        <tr>
+            <td>所在项目组：</td>
+            <td>
+                <input readonly type="text" value="" id="teamId">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <button class="btn-default" onclick="addInfo()">保存信息</button>
+                    <button class="btn-primary" onclick="history.back()">返回</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="col-md-4"></div>
+<script type="text/javascript">
+    $(function () {
+        $('#teamId').val(localStorage.getItem("teamId"));
+    });
+
+    function addInfo() {
+        var email = $('#email').val();
+        var studentName = $('#studentName').val();
+        var studentNo = $('#studentNo').val();
+        var gender = $('#gender').val();
+        var teamId = $('#teamId').val();
+        $.ajax({
+            url: "http://localhost:1011/labcode/put/student/info",
+            data: {
+                "type": "teacher",
+                "email": email,
+                "studentName": studentName,
+                "studentNo": studentNo,
+                "gender": gender,
+                "teamId": teamId
+            },
+            success: function (resp) {
+                if (resp.code === '0001') {
+                    alert("保存成功");
+                    $('#email').val('');
+                    $('#studentName').val('');
+                    $('#studentNo').val('');
+                    $('#gender').val('');
+
+                } else {
+                    alert("保存失败");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>
